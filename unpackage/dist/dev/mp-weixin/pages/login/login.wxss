@@ -1,0 +1,9 @@
+
+input{
+	width: 100%;
+	height: 60rpx;
+	-webkit-border-radius: 30rpx;
+	        border-radius: 30rpx;
+	border: #8F8F94 solid 3rpx;
+}
+

@@ -1,0 +1,77 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationBarBackgroundColor":"white"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "JIM测试",
+				"navigationBarBackgroundColor":"white"
+			}
+		},
+		{
+			"path": "pages/chatlist/chatlist",
+			"style": {
+				"navigationBarTitleText": "消息",
+				"navigationBarBackgroundColor":"white"
+			}
+		},
+		{
+			"path": "pages/me/me",
+			"style": {
+				"navigationBarTitleText": "我",
+				"navigationBarBackgroundColor":"white"
+			}
+		},
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"navigationBarTitleText": "聊天",
+				"navigationBarBackgroundColor":"white"
+			}
+		}
+		
+		
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar":{
+		"color":"black",
+		"selectedColor":"#1CBBB4",
+		"backgroundColor":"white",
+		"list":[
+				{
+					"pagePath":"pages/chatlist/chatlist",
+					"text":"消息"
+				},
+				{
+					"pagePath":"pages/index/index",
+					"text":"通讯录"
+				},
+				{
+					"pagePath":"pages/me/me",
+					"text":"我"
+				}
+			
+			]
+	},
+	"condition" : { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "pages/login/login", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}

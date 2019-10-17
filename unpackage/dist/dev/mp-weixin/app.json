@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/chatlist/chatlist",
+    "pages/me/me"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "black",
+    "selectedColor": "#1CBBB4",
+    "backgroundColor": "white",
+    "list": [
+      {
+        "pagePath": "pages/chatlist/chatlist",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "通讯录"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我"
+      }
+    ]
+  },
+  "usingComponents": {
+    "md5": "/js_sdk/js-md5/build/md5.min",
+    "j-i-m": "/js_sdk/wxmp-jiguang/jmessage-wxapplet-sdk-1.4.0/jmessage-wxapplet-sdk-1.4.0.min",
+    "cu-custom": "/colorui/components/cu-custom"
+  }
+}
