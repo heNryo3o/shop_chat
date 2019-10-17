@@ -50,10 +50,10 @@
 		data() {
 			return {
 				username: uni.getStorageSync("username"),
-				msgss: null,
+				msgss: [],
 				my_avatar: uni.getStorageSync("my_avatar"),
 				chater_info: null,
-				Chat_Record: null,
+				Chat_Record: [],
 				my_say_text: '',
 				InputBottom: 0,
 				Time_now: {
@@ -75,14 +75,13 @@
 			this.load_chater_info()
 			this.to_bottom()
 			this.get_msg_ol()
-
 		},
 		onShow() {
 			this.to_bottom()
-
 		},
 		methods: {
 			load_chater_info() {
+				console.log(this.username)
 				var that = this;
 				var chater_info;
 				chater_info = uni.getStorageSync('chater_info')
@@ -91,16 +90,19 @@
 				uni.setNavigationBarTitle({
 					title: chater_info.nickName
 				})
-
 				//下方初始化聊天记录
 				var Chat_Record
-
+				// let user_info = uni.getStorageSync('userInfo')
+				let username = uni.getStorageSync('username')
+				// this.username = 'user_'+user_info.id
+				// this.my_avatar = user_info.avatar
+				// console.log(user_info)
 				var Chat_Record_ol = []
 				uni.request({
-					url: 'https://report.im.jpush.cn/v2/users/' + that.$data.username +
-						'/messages?count=1000&begin_time=2019-06-09%2023:59:59&end_time=2019-06-15%2023:59:59',
+					url: 'https://report.im.jpush.cn/v2/users/' + username +
+						'/messages?count=1000&begin_time=2019-10-11%2023:59:59&end_time=2019-10-17%2015:47:59',
 					header: {
-						"Authorization": 'Basic NjllNzc2YmI1MWMzYTI2NGNmMzY0YTk3OjRmN2YzNTc1YTY5MTBjOTU2MGYzZDk2Ng=='
+						"Authorization": 'Basic YjdjZTM1YTgzMzVjOGFiNzZjNThkZmQwOjgwODcxYmFmMTk4ODFhNzAzNmQ3NzRjNQ=='
 					},
 					success(res) {
 						console.log(res.data)
@@ -180,13 +182,15 @@
 					//无内容直接跳出
 					return;
 				}
-
+				console.log('send')
+				console.log(that.$data.chater_info.username)
 				this.JIM.sendSingleMsg({
 					'target_username': that.$data.chater_info.username,
 					'target_nickname': that.$data.chater_info.nickName,
 					'content': my_say_text,
-					'appkey': '69e776bb51c3a264cf364a97'
+					'appkey': 'b7ce35a8335c8ab76c58dfd0'
 				}).onSuccess(function(data, msg) {
+					console.log(data)
 					//data.code 返回码
 					//data.message 描述
 					//data.msg_id 发送成功后的消息 id
@@ -210,6 +214,7 @@
 					console.log(data)
 					console.log(msg)
 				}).onFail(function(data) {
+					console.log(data)
 					//data.code 返回码
 					//data.message 描述
 				});
@@ -243,6 +248,9 @@
 </script>
 
 <style>
+	@import "../../colorui/icon.css";
+	@import "../../colorui/main.css";
+
 	page {
 		padding-bottom: 100upx;
 	}
