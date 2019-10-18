@@ -49,12 +49,12 @@
 			uni.showLoading({
 				title: '加载中'
 			})
-			uni.setStorageSync('username',e.username)
+			if(e.username){
+				uni.setStorageSync('username',e.username)
+			}
+			
 			this.Times_now();
-			this.init(e.username)
-		},
-		onShow() {
-
+			this.init(uni.getStorageSync('username'))
 		},
 		methods: {
 			init(username) {

@@ -99,31 +99,44 @@
 				// console.log(user_info)
 				var Chat_Record_ol = []
 				uni.request({
-					url: 'https://report.im.jpush.cn/v2/users/' + username +
-						'/messages?count=1000&begin_time=2019-10-11%2023:59:59&end_time=2019-10-17%2015:47:59',
+					url: getApp().globalData.api + 'system/chat-log',
+					method: 'GET',
 					header: {
-						"Authorization": 'Basic YjdjZTM1YTgzMzVjOGFiNzZjNThkZmQwOjgwODcxYmFmMTk4ODFhNzAzNmQ3NzRjNQ=='
+						'content-type': 'application/json' //自定义请求头信息
 					},
-					success(res) {
+					data:{
+						username: username
+					},
+					success(res){
 						console.log(res.data)
-						var lszs = res.data.messages
-						console.log(res.data.messages)
-						for (var i = 0; i < res.data.messages.length; i++) {
-							if (res.data.messages[i].from_id == that.$data.chater_info.username && res.data.messages[i].target_id == that.$data
-								.username || res.data.messages[i].from_id == that.$data.username && res.data.messages[i].target_id == that.$data
-								.chater_info.username) {
-								console.log(res.data.messages[i]);
-								// res.data.messages[i].create_time=that.get_message_time(res.data.messages[i].create_time,i)
-								Chat_Record_ol.push(res.data.messages[i])
-							}
-						}
-						console.log(Chat_Record_ol)
-						that.$data.Chat_Record = Chat_Record_ol
-						for (var e = 0; e < Chat_Record_ol.length; e++) {
-							that.get_message_time(Chat_Record_ol[e].msg_ctime, e)
-						}
+								var lszs = res.data.data.messages
+								console.log(res.data.data.messages)
+								for (var i = 0; i < res.data.data.messages.length; i++) {
+									if (res.data.data.messages[i].from_id == that.$data.chater_info.username && res.data.data.messages[i].target_id == that.$data
+										.username || res.data.data.messages[i].from_id == that.$data.username && res.data.data.messages[i].target_id == that.$data
+										.chater_info.username) {
+										console.log(res.data.data.messages[i]);
+										// res.data.messages[i].create_time=that.get_message_time(res.data.messages[i].create_time,i)
+										Chat_Record_ol.push(res.data.data.messages[i])
+									}
+								}
+								console.log(Chat_Record_ol)
+								that.$data.Chat_Record = Chat_Record_ol
+								for (var e = 0; e < Chat_Record_ol.length; e++) {
+									that.get_message_time(Chat_Record_ol[e].msg_ctime, e)
+								}
 					}
 				})
+				// uni.request({
+				// 	url: 'https://report.im.jpush.cn/v2/users/' + username +
+				// 		'/messages?count=1000&begin_time=2019-10-11%2023:59:59&end_time=2019-10-17%2015:47:59',
+				// 	header: {
+				// 		"Authorization": 'Basic YjdjZTM1YTgzMzVjOGFiNzZjNThkZmQwOjgwODcxYmFmMTk4ODFhNzAzNmQ3NzRjNQ=='
+				// 	},
+				// 	success(res) {
+				// 		
+				// 	}
+				// })
 				that.to_bottom()
 				uni.hideLoading()
 				//更新会话未读消息数   填对方的username，不要填自己的
