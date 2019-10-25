@@ -1,29 +1,12 @@
 <template>
 	<view>
 		<view class="cu-chat" id="chatlist">
-			<!-- <view class="cu-item self">
-				<view class="main">
-					<view class="content bg-green shadow">
-						<text>喵喵喵！喵喵喵！喵喵喵！喵喵！喵喵！！喵！喵喵喵！</text>
-					</view>
-				</view>
-				<view class="cu-avatar round" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big107000.jpg);"></view>
-				<view class="date">2018年3月23日 13:23</view>
-			</view>
-			<view class="cu-item">
-				<view class="cu-avatar radius" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big143004.jpg);"></view>
-				<view class="main">
-					<view class="content shadow">
-						<text>喵喵喵！喵喵喵！</text>
-					</view>
-				</view>
-				<view class="date "> 13:23</view>
-			</view> -->
 			<view class="cu-item" :class="item.from_id==username?'self':''" v-for="(item,index) in Chat_Record" :key="index" :id="(item)">
 				<view v-if="item.from_id==chater_info.username" class="cu-avatar round" :style="{backgroundImage:'url('+chater_info.avatar+')'}"></view>
 				<view class="main">
 					<view class="content shadow" :class="item.from_id==username?'bg-green':''">
-						<text>{{item.msg_body.text}}</text>
+						<text v-if="item.msg_body.text">{{item.msg_body.text}}</text>
+						<image v-if="item.msg_body.media_src" :src="item.msg_body.media_src" style="max-width: 300rpx;"></image>
 					</view>
 				</view>
 				<view v-if="item.from_id==username" class="cu-avatar round" :style="{backgroundImage:'url('+my_avatar+')'}"></view>
@@ -33,13 +16,10 @@
 
 		<view class="cu-bar foot input" :style="[{bottom:InputBottom+'px'}]">
 			<view class="action">
-				<text class="cuIcon-sound text-grey"></text>
+				<text class="cuIcon-picfill text-grey" @tap="chooseImage"></text>
 			</view>
 			<input class="solid-bottom" :adjust-position="false" :focus="false" maxlength="300" cursor-spacing="10" @focus="InputFocus"
 			 @blur="InputBlur" v-model="my_say_text"></input>
-			<view class="action">
-				<text class="cuIcon-emojifill text-grey"></text>
-			</view>
 			<button class="cu-btn bg-green shadow" @click="to_send()">发送</button>
 		</view>
 	</view>
@@ -49,9 +29,9 @@
 	export default {
 		data() {
 			return {
-				username: uni.getStorageSync("username"),
+				username: '',
 				msgss: [],
-				my_avatar: uni.getStorageSync("my_avatar"),
+				my_avatar: '',
 				chater_info: null,
 				Chat_Record: [],
 				my_say_text: '',
@@ -71,15 +51,74 @@
 			uni.showLoading({
 				title: '加载中'
 			})
+			this.init()
 			this.Times_now();
-			this.load_chater_info()
 			this.to_bottom()
-			this.get_msg_ol()
 		},
 		onShow() {
 			this.to_bottom()
 		},
 		methods: {
+			chooseImage() {
+				var that = this
+				uni.chooseImage({
+					success(res) {
+						console.log(res.tempFilePaths[0])
+						that.JIM.sendSinglePic({
+							'target_username': that.$data.chater_info.username,
+							'appkey': 'b7ce35a8335c8ab76c58dfd0',
+							'image': res.tempFilePaths[0] //构造好的 FormData
+						}).onSuccess(function(data, msg) {
+							console.log('success:' + JSON.stringify(data))
+							console.log(msg)
+							var msgss = that.$data.Chat_Record
+							msg.content.timess = that.$data.Time_now.h + that.$data.Time_now.m
+							msg.content.msg_body.media_src = res.tempFilePaths[0]
+							msgss.push(msg.content)
+						}).onFail(function(data) {
+							console.log('error:' + JSON.stringify(data))
+						});
+					}
+				})
+			},
+			init() {
+				let userinfo = uni.getStorageSync('userInfo')
+				this.username = 'user_' + userinfo.id
+				this.my_avatar = userinfo.avatar
+				this.jLogin('user_' + userinfo.id)
+			},
+			jLogin(username) {
+				let that = this;
+				let un = username;
+				let pw = '123456';
+				console.log(username)
+				this.JIM.login({
+					'username': un,
+					'password': pw
+				}).onSuccess(function(data) {
+					that.load_chater_info()
+					that.get_msg_ol()
+				}).onFail(function(data) {
+					that.load_chater_info()
+					that.get_msg_ol()
+				});
+			},
+			rRegister() {
+				var that = this
+				uni.request({
+					url: getApp().globalData.api + 'user/j-register',
+					method: 'POST',
+					header: {
+						'content-type': 'application/json'
+					},
+					data: {
+						open_id: uni.getStorageSync('open_id')
+					},
+					success(res) {
+						that.jLogin(res.data.data.username)
+					}
+				})
+			},
 			load_chater_info() {
 				console.log(this.username)
 				var that = this;
@@ -90,13 +129,9 @@
 				uni.setNavigationBarTitle({
 					title: chater_info.nickName
 				})
-				//下方初始化聊天记录
+
 				var Chat_Record
-				// let user_info = uni.getStorageSync('userInfo')
-				let username = uni.getStorageSync('username')
-				// this.username = 'user_'+user_info.id
-				// this.my_avatar = user_info.avatar
-				// console.log(user_info)
+				let userinfo = uni.getStorageSync('userInfo')
 				var Chat_Record_ol = []
 				uni.request({
 					url: getApp().globalData.api + 'system/chat-log',
@@ -104,39 +139,32 @@
 					header: {
 						'content-type': 'application/json' //自定义请求头信息
 					},
-					data:{
-						username: username
+					data: {
+						username: 'user_' + userinfo.id
 					},
-					success(res){
+					success(res) {
 						console.log(res.data)
-								var lszs = res.data.data.messages
-								console.log(res.data.data.messages)
-								for (var i = 0; i < res.data.data.messages.length; i++) {
-									if (res.data.data.messages[i].from_id == that.$data.chater_info.username && res.data.data.messages[i].target_id == that.$data
-										.username || res.data.data.messages[i].from_id == that.$data.username && res.data.data.messages[i].target_id == that.$data
-										.chater_info.username) {
-										console.log(res.data.data.messages[i]);
-										// res.data.messages[i].create_time=that.get_message_time(res.data.messages[i].create_time,i)
-										Chat_Record_ol.push(res.data.data.messages[i])
-									}
-								}
-								console.log(Chat_Record_ol)
-								that.$data.Chat_Record = Chat_Record_ol
-								for (var e = 0; e < Chat_Record_ol.length; e++) {
-									that.get_message_time(Chat_Record_ol[e].msg_ctime, e)
-								}
+						var lszs = res.data.data.messages
+						console.log(res.data.data.messages)
+						for (var i = 0; i < res.data.data.messages.length; i++) {
+							if (res.data.data.messages[i].from_id == that.$data.chater_info.username && res.data.data.messages[i].target_id ==
+								that.$data
+								.username || res.data.data.messages[i].from_id == that.$data.username && res.data.data.messages[i].target_id ==
+								that.$data
+								.chater_info.username) {
+								console.log(res.data.data.messages[i]);
+								// res.data.messages[i].create_time=that.get_message_time(res.data.messages[i].create_time,i)
+								Chat_Record_ol.push(res.data.data.messages[i])
+							}
+						}
+						console.log(Chat_Record_ol)
+						that.$data.Chat_Record = Chat_Record_ol
+						for (var e = 0; e < Chat_Record_ol.length; e++) {
+							that.get_message_time(Chat_Record_ol[e].msg_ctime, e)
+						}
 					}
 				})
-				// uni.request({
-				// 	url: 'https://report.im.jpush.cn/v2/users/' + username +
-				// 		'/messages?count=1000&begin_time=2019-10-11%2023:59:59&end_time=2019-10-17%2015:47:59',
-				// 	header: {
-				// 		"Authorization": 'Basic YjdjZTM1YTgzMzVjOGFiNzZjNThkZmQwOjgwODcxYmFmMTk4ODFhNzAzNmQ3NzRjNQ=='
-				// 	},
-				// 	success(res) {
-				// 		
-				// 	}
-				// })
+
 				that.to_bottom()
 				uni.hideLoading()
 				//更新会话未读消息数   填对方的username，不要填自己的
