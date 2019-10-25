@@ -59,6 +59,24 @@
 			this.to_bottom()
 		},
 		methods: {
+			get_image(media_id, msg_data) {
+				var that = this;
+				this.JIM.getResource({
+					'media_id': media_id,
+				}).onSuccess(function(data) {
+					//data.code 返回码
+					//data.message 描述
+					//data.url 资源临时访问路径，具体超时时间expire time会包含在url中
+					console.log(data.url)
+					//头像：data.user_info.avatar
+					//that.$data.my_avatar=data.url
+					msg_data.msg_body.media_src = data.url
+					that.$data.Chat_Record.push(msg_data)
+				}).onFail(function(data) {
+					//data.code 返回码
+					//data.message 描述
+				});
+			},
 			chooseImage() {
 				var that = this
 				uni.chooseImage({
@@ -165,9 +183,9 @@
 							that.get_message_time(Chat_Record_ol[e].msg_ctime, e)
 						}
 						that.to_bottom()
+						uni.hideLoading()
 					}
 				})
-				uni.hideLoading()
 				//更新会话未读消息数   填对方的username，不要填自己的
 				this.JIM.resetUnreadCount({
 					'username': that.$data.chater_info.username
@@ -176,10 +194,9 @@
 			to_bottom() {
 				setTimeout(function() {
 					uni.pageScrollTo({
-						scrollTop: 3000
+						scrollTop: 300000
 					})
 				}, 1000);
-
 			},
 			Times_now() {
 				var that = this;
@@ -269,7 +286,12 @@
 						that.Times_now();
 						var msgss = that.$data.Chat_Record
 						data.timess = that.$data.Time_now.h + that.$data.Time_now.m
-						msgss.push(data)
+						if (data.msg_body.media_id) {
+							that.get_image(data.msg_body.media_id, data)
+							// console.log(data.msg_body.media_src,data)
+						} else {
+							msgss.push(data)
+						}
 						that.to_bottom()
 						this.JIM.resetUnreadCount({
 							'username': that.$data.chater_info.username

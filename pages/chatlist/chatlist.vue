@@ -49,14 +49,21 @@
 			uni.showLoading({
 				title: '加载中'
 			})
-			if(e.username){
-				uni.setStorageSync('username',e.username)
+			if (e.username) {
+				uni.setStorageSync('username', e.username)
 			}
-			
+
 			this.Times_now();
 			this.init(uni.getStorageSync('username'))
+			this.get_msg_ol();
 		},
 		methods: {
+			get_msg_ol() {
+				var that = this;
+				uni.$on('msg_ol', function(data) {
+					that.getConversation()
+				})
+			},
 			init(username) {
 				var appkey = 'b7ce35a8335c8ab76c58dfd0';
 				var key = '80871baf19881a7036d774c5';
