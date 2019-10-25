@@ -60,5 +60,9 @@
             "urlCheck" : false
         },
         "usingComponents" : true
+    },
+    "h5" : {
+        "title" : "im",
+        "domain" : "chat.jiangsulezhong.com"
     }
 }
