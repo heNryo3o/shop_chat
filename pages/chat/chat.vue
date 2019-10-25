@@ -75,6 +75,7 @@
 							msg.content.timess = that.$data.Time_now.h + that.$data.Time_now.m
 							msg.content.msg_body.media_src = res.tempFilePaths[0]
 							msgss.push(msg.content)
+							that.to_bottom()
 						}).onFail(function(data) {
 							console.log('error:' + JSON.stringify(data))
 						});
@@ -163,10 +164,9 @@
 						for (var e = 0; e < Chat_Record_ol.length; e++) {
 							that.get_message_time(Chat_Record_ol[e].msg_ctime, e)
 						}
+						that.to_bottom()
 					}
 				})
-
-				that.to_bottom()
 				uni.hideLoading()
 				//更新会话未读消息数   填对方的username，不要填自己的
 				this.JIM.resetUnreadCount({
