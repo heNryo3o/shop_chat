@@ -6,7 +6,7 @@
 				<view class="main">
 					<view class="content shadow" :class="item.from_id==username?'bg-green':''">
 						<text v-if="item.msg_body.text">{{item.msg_body.text}}</text>
-						<image v-if="item.msg_body.media_src" :src="item.msg_body.media_src" style="max-width: 300rpx;"></image>
+						<image v-if="item.msg_body.media_src" :src="item.msg_body.media_src" mode="widthFix" style="max-width: 400rpx;"></image>
 					</view>
 				</view>
 				<view v-if="item.from_id==username" class="cu-avatar round" :style="{backgroundImage:'url('+my_avatar+')'}"></view>
@@ -29,9 +29,9 @@
 	export default {
 		data() {
 			return {
-				username: '',
+				username: uni.getStorageSync('username'),
 				msgss: [],
-				my_avatar: '',
+				my_avatar: uni.getStorageSync('avatar'),
 				chater_info: null,
 				Chat_Record: [],
 				my_say_text: '',
@@ -82,10 +82,10 @@
 				})
 			},
 			init() {
-				let userinfo = uni.getStorageSync('userInfo')
-				this.username = 'user_' + userinfo.id
-				this.my_avatar = userinfo.avatar
-				this.jLogin('user_' + userinfo.id)
+				// let userinfo = uni.getStorageSync('userInfo')
+				// this.username = 'user_' + userinfo.id
+				// this.my_avatar = userinfo.avatar
+				this.jLogin(this.username)
 			},
 			jLogin(username) {
 				let that = this;
@@ -96,6 +96,7 @@
 					'username': un,
 					'password': pw
 				}).onSuccess(function(data) {
+					console.log(data)
 					that.load_chater_info()
 					that.get_msg_ol()
 				}).onFail(function(data) {
@@ -131,7 +132,6 @@
 				})
 
 				var Chat_Record
-				let userinfo = uni.getStorageSync('userInfo')
 				var Chat_Record_ol = []
 				uni.request({
 					url: getApp().globalData.api + 'system/chat-log',
@@ -140,10 +140,11 @@
 						'content-type': 'application/json' //自定义请求头信息
 					},
 					data: {
-						username: 'user_' + userinfo.id
+						username: that.username
 					},
 					success(res) {
 						console.log(res.data)
+						that.my_avatar = res.data.data.avatar
 						var lszs = res.data.data.messages
 						console.log(res.data.data.messages)
 						for (var i = 0; i < res.data.data.messages.length; i++) {
